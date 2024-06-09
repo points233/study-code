@@ -128,7 +128,7 @@ int open_port(char *com)
 }
 
 /*
- * ./serial_send_recv <dev>
+ * ./uart <dev>
  */
 int main(int argc, char **argv)
 {
