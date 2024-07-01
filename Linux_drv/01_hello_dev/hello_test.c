@@ -24,7 +24,7 @@ int main(int argc, char **argv)
     fd = open(argv[1], O_RDWR);
     if(fd < 0)
     {
-        perror("can not open file %s\n", argv[1]);
+        printf("can not open file %s\n", argv[1]);
         return -1;
     }
     // write
@@ -42,6 +42,7 @@ int main(int argc, char **argv)
     }
     
     // close
+    close(fd);
 
     return 0;
 }

@@ -1,2 +1,9 @@
 .vscode/
 *.idx
+*.o
+*.cmd
+*.ko
+*.mod
+*.symvers
+*.order
+compile_commands.json
