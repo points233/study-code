@@ -17,35 +17,35 @@
 
 /* 1.确定主设备号 */
 static int major = 0;
-static char kernel_buf[1024];
+static char hello_buf[1024];
 static struct class *hello_class;
 
-#define MIN(a,b) (a < b ? a : b)
-
 /* 3.实现对应的open/read/write等函数，填入file_operations结构体 */
-static ssize_t hello_drv_read (struct file *file, char __user *buf, size_t size, loff_t *offset)
-{
-    int err;
-    printk("%s %s line %d\n", __FILE__, __FUNCTION__, __LINE__);
-    err = copy_to_user(buf, kernel_buf, MIN(1024, size));
-    return MIN(1024, size);
-}
-
-static ssize_t hello_drv_write (struct file *file, const char __user *buf, size_t size, loff_t *offset)
-{
-    int err;
-    printk("%s %s line %d\n", __FILE__, __FUNCTION__, __LINE__);
-    err = copy_from_user(kernel_buf, buf, MIN(1024, size));
-    return MIN(1024, size);
-}
-
-static int hello_dev_open (struct inode *node, struct file *file)
+static int hello_open (struct inode *node, struct file *file)
 {
     printk("%s %s line %d\n", __FILE__, __FUNCTION__, __LINE__);
     return 0;
 }
 
-static int hello_drv_close (struct inode *node, struct file *file)
+static ssize_t hello_read (struct file *file, char __user *buf, size_t size, loff_t *offset)
+{
+    int err;
+    unsigned long len = size > 100 ? 100 : size;
+    printk("%s %s line %d\n", __FILE__, __FUNCTION__, __LINE__);
+    err = copy_to_user(buf, hello_buf, len);
+    return len;
+}
+
+static ssize_t hello_write (struct file *file, const char __user *buf, size_t size, loff_t *offset)
+{
+    int err;
+    unsigned long len = size > 100 ? 100 : size;
+    printk("%s %s line %d\n", __FILE__, __FUNCTION__, __LINE__);
+    err = copy_from_user(hello_buf, buf, len);
+    return len;
+}
+
+static int hello_close (struct inode *node, struct file *file)
 {
     printk("%s %s line %d\n", __FILE__, __FUNCTION__, __LINE__);
     return 0;
@@ -55,10 +55,10 @@ static int hello_drv_close (struct inode *node, struct file *file)
 /* 2.定义自己的file_operations结构体 */
 static struct file_operations hello_drv = {
 	.owner		= THIS_MODULE,
-    .open       = hello_dev_open,
-    .read       = hello_drv_read,
-    .write      = hello_drv_write,
-    .release    = hello_drv_close,
+    .open       = hello_open,
+    .read       = hello_read,
+    .write      = hello_write,
+    .release    = hello_close,
 
 };
 
@@ -75,6 +75,7 @@ static int __init hello_init(void)
 	err = PTR_ERR(hello_class);
 	if (IS_ERR(hello_class))
     {
+        printk("failed to allocate class\n");
         unregister_chrdev(major, "hello");
         return -1;
     }
