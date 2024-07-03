@@ -7,3 +7,5 @@
 *.symvers
 *.order
 compile_commands.json
+Linux_drv/02_hello_drv_transfer_data/hello_test
+Linux_drv/03_hello_drv_cdev/hello_test
